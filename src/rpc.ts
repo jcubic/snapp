@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+import { useAuth } from './auth';
+
 const rpc = initRPC('/api/');
 
 type RPCService = {
@@ -66,4 +68,23 @@ function useRPC<T>(method: string, init: T | null = null) {
     return { isLoading, error, result, call };
 }
 
-export { useRPC };
+function useSecureRPC<T>(method: string, init: T | null = null) {
+    const { auth } = useAuth();
+    const [ authError, setAuthError ] = useState<string | null>(null);
+    const {
+        error,
+        call: rpc,
+        result,
+        isLoading
+    } = useRPC<T>(method, init);
+    const call = (...args: any[]) => {
+        if (!auth) {
+            setAuthError('Missing token');
+        } else {
+            return rpc(auth.token, ...args);
+        }
+    };
+    return { call, error, result, isLoading, authError };
+}
+
+export { useRPC, useSecureRPC };

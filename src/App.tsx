@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 
 import './App.css';
 
-import { useRPC } from './rpc';
+import { useRPC, useSecureRPC } from './rpc';
 import { TreeView } from './componets/TreeView';
 import ErrorBoundary from './error';
 
@@ -62,12 +62,13 @@ function App() {
         error,
         call: get_notes,
         result: notes,
+        authError,
         isLoading
-    } = useRPC<INote[]>('get_notes');
+    } = useSecureRPC<INote[]>('get_notes');
 
     useEffect(() => {
         if (auth) {
-            get_notes(auth.token, auth.username);
+            get_notes(auth.username);
         }
     }, [auth]);
 
@@ -80,6 +81,9 @@ function App() {
     }
     if (error || !notes) {
         return <p>error</p>;
+    }
+    if (authError) {
+        return <p>Error: {authError}</p>;
     }
 
     return (
