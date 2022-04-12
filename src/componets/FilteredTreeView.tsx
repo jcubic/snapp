@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+import style from './FilteredTreeView.module.css';
 import { TreeView, TreeNodeT } from './TreeView';
 
 export type filterFn<T extends TreeNodeT<T>> = (test: RegExp, item: T) => boolean;
@@ -37,7 +38,7 @@ export const FilteredTreeView = <T extends TreeNodeT<T>,>({ data, onChange, clas
 
   return (
     <div className={className}>
-      <input onChange={e => filterNotes(e.target.value)}/>
+      <input className={style.filter} onChange={e => filterNotes(e.target.value)}/>
       <TreeView data={displayList ? displayList.map(i => data[i]) : data}
                 onChange={(arg) => onChange(arg)} />
     </div>
