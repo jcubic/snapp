@@ -12,8 +12,29 @@
 .app header {
     grid-area: header;
 }
-.app textarea {
+.note {
     grid-area: content;
+    position: relative;
+    font-size: 14px;
+    font-family: monospace;
+}
+.note::before {
+    width: calc(80ch + 2px);
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-right: 1px solid #aaa;
+    z-index: 1000;
+    pointer-events: none;
+}
+.note textarea {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: block;
+    font-size: inherit;
 }
 .sidebar {
     grid-area: sidebar;
@@ -21,7 +42,7 @@
 .app footer {
     grid-area: footer;
 }
-.app textarea, .sidebar {
+.note, .sidebar {
     height: 100%;
     box-sizing: border-box;
     overflow: auto;

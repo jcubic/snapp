@@ -78,7 +78,9 @@ function App() {
           <h1>This is { note?.name }</h1>
           <Test/>
         </header>
-        <textarea value={note?.content } onChange={(e) => { updateNote(e.target.value) }} />
+        <div className={style.note}>
+          <textarea value={note?.content } onChange={(e) => { updateNote(e.target.value) }} />
+        </div>
         <FilteredTreeView className={style.sidebar}
                           data={notes}
                           filter={(re, note) => !!note.name.match(re)}
