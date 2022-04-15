@@ -7,7 +7,7 @@ export type filterFn<T extends TreeNodeT<T>> = (test: RegExp, item: T) => boolea
 
 type FilteredTreeViewProps<T extends TreeNodeT<T>> = {
   data: T[];
-  link: RenderProp;
+  link: RenderProp<T>;
   filter: filterFn<T>;
   className: string;
 };
