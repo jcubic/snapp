@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 
 import style from './FilteredTreeView.module.css';
-import { TreeView, TreeNodeT } from './TreeView';
+import { TreeView, TreeNodeT, RenderProp } from './TreeView';
 
 export type filterFn<T extends TreeNodeT<T>> = (test: RegExp, item: T) => boolean;
 
 type FilteredTreeViewProps<T extends TreeNodeT<T>> = {
   data: T[];
-  onChange: (arg: T) => void;
+  link: RenderProp;
   filter: filterFn<T>;
   className: string;
 };
@@ -16,7 +16,7 @@ function isNumber(item: number | null): item is number {
   return item !== null;
 }
 
-export const FilteredTreeView = <T extends TreeNodeT<T>,>({ data, onChange, className, filter }: FilteredTreeViewProps<T>) => {
+export const FilteredTreeView = <T extends TreeNodeT<T>,>({ data, link, className, filter }: FilteredTreeViewProps<T>) => {
   const [ displayList, setDisplayList ] = useState<number[] | null>(null);
 
   const getIndexList = (flags: boolean[]): number[] => {
@@ -40,7 +40,7 @@ export const FilteredTreeView = <T extends TreeNodeT<T>,>({ data, onChange, clas
     <div className={className}>
       <input className={style.filter} onChange={e => filterNotes(e.target.value)}/>
       <TreeView data={displayList ? displayList.map(i => data[i]) : data}
-                onChange={(arg) => onChange(arg)} />
+                link={link} />
     </div>
   );
 };

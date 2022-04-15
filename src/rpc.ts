@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import axios from 'axios';
 
-import { useAuth } from './auth';
+import { useAuth, AuthContext } from './auth';
 
 const rpc = initRPC('/api/');
 
@@ -69,7 +69,7 @@ function useRPC<T>(method: string, init: T | null = null) {
 }
 
 function useSecureRPC<T>(method: string, init: T | null = null) {
-    const { auth } = useAuth();
+    const { auth } = useContext(AuthContext);
     const [ authError, setAuthError ] = useState<string | null>(null);
     const {
         error,
