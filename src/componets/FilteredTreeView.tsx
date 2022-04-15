@@ -29,7 +29,7 @@ export const FilteredTreeView = <T extends TreeNodeT<T>,>({ data, link, classNam
 
   const filterNotes = (value: string) => {
     if (value) {
-      const re = new RegExp(value);
+      const re = new RegExp(value, 'i');
       setDisplayList(getIndexList(data.map((item: T) => filter(re, item))));
     } else {
       setDisplayList(null);

@@ -1,10 +1,8 @@
-import { Link } from 'react-router-dom';
-
 import { tree } from './TreeView.module.css';
 
 type TreeNodeT<T> = {
   name: string;
-  id: number;
+  id: number | string;
   childNodes?: T[];
 };
 

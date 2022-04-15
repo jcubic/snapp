@@ -89,7 +89,7 @@ const Notes = () => {
       <FilteredTreeView className={style.sidebar}
                         data={notes}
                         filter={(re, note) => !!note.name.match(re)}
-                        link={(note: INote) => <Link to={`/note/${note.id}`}>{note.name}</Link>}/>
+                        link={(note: INote) => <Link to={`/notes/${note.id}`}>{note.name}</Link>}/>
       <footer className={style.footer}>
         <p>
           Copyright (C) 2022 <a href="https://jakub.jankiewicz.org">Jakub T. Jankiewicz</a>
