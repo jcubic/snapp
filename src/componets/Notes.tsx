@@ -93,7 +93,10 @@ const Notes: FC<NotesProps> = ({title}) => {
         <h1>This is { note?.name }</h1>
       </header>
       <div className={style.note}>
-        <textarea value={note?.content} onChange={(e) => { updateNote(e.target.value) }} />
+        <textarea value={note?.content}
+                  onChange={(e) => {
+                    updateNote(e.target.value);
+                  }} />
       </div>
       <FilteredTreeView className={style.sidebar}
                         data={notes}
@@ -107,7 +110,7 @@ const Notes: FC<NotesProps> = ({title}) => {
                                             }
                                             return classNames.join(' ');
                                           }}>
-                            {note.name}
+                            {note.name}{note.dirty ? "*" : ""}
                           </NavLink>;
                         }}/>
       <footer className={style.footer}>
