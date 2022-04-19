@@ -2,6 +2,8 @@
 
 SNApp - stands for Simple Notes App
 
+This application is rewrite of [AngularJS Based Notes App](https://github.com/jcubic/notes). The build system is broken and there is no way to add new planed features, and fix known bugs.
+
 ## License
 
 ```
