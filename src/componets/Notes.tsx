@@ -1,7 +1,11 @@
-import { useState, useEffect, useContext, FC } from 'react';
+import { useState, useEffect, useRef, useContext, FC } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 import { useParams, NavLink } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { FilteredTreeView } from './FilteredTreeView';
 import { useSecureRPC } from '../rpc';
+import { withHokey } from '../hotkeys';
 
 interface INote {
   id: string;
@@ -24,6 +28,8 @@ const Notes: FC<NotesProps> = ({title}) => {
   const [ notes, setNotes ] = useState<INote[]>([]);
   const [ note, setNote ] = useState<INote | null>(null);
   const [ init, setInit ] = useState<boolean>(true);
+  const input = useRef<HTMLTextAreaElement | null>(null);
+
   if (!auth) {
     return null;
   }
@@ -34,15 +40,21 @@ const Notes: FC<NotesProps> = ({title}) => {
   }, [note]);
   const {
     error,
-    call: get_notes,
+    call: getNotes,
     result: initNotes,
     authError,
     isLoading
   } = useSecureRPC<INote[]>('get_notes');
 
+  const {
+    error: saveError,
+    call: saveNotes
+  } = useSecureRPC<void>('save_note');
+
   useEffect(() => {
     if (notes.length && init) {
       setNote(notes[0]);
+
       setInit(false);
     }
   }, [notes]);
@@ -63,18 +75,47 @@ const Notes: FC<NotesProps> = ({title}) => {
   }, [initNotes]);
 
   useEffect(() => {
+    if (note && input?.current) {
+      input.current.value = note?.content;
+    }
+  }, [note]);
+
+  useEffect(() => {
     if (auth) {
-      get_notes(auth.username);
+      getNotes(auth.username);
     }
   }, [auth]);
 
+  useEffect(() => {
+    if (saveError) {
+      console.log(saveError);
+      toast(saveError, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        progress: undefined
+      });
+    }
+  }, [saveError]);
+
   const updateNote = (value: string) => {
-    const id = note?.id;
-    const index = notes.findIndex(note => note.id == id);
+    const index = findNoteIndex();
     notes[index].content = value;
     notes[index].dirty = true;
     setNotes([...notes]);
   };
+
+  const makePristine = () => {
+    const index = findNoteIndex();
+    delete notes[index].dirty;
+  }
+
+  const findNoteIndex = () => {
+    const id = note?.id;
+    const index = notes.findIndex(note => note.id == id);
+    return index;
+  }
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -86,6 +127,18 @@ const Notes: FC<NotesProps> = ({title}) => {
     return <p>Error: {authError}</p>;
   }
 
+  const keymap = {
+    'CTRL+S': (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (auth) {
+        saveNotes(auth.username, note);
+        makePristine();
+      }
+      e.preventDefault();
+    }
+  };
+  // TODO: add toaster for RPC errors
+
+
   return (
     <div className={ style.app }>
       <header>
@@ -93,10 +146,18 @@ const Notes: FC<NotesProps> = ({title}) => {
         <h1>This is { note?.name }</h1>
       </header>
       <div className={style.note}>
-        <textarea value={note?.content}
+        <textarea ref={input}
+                  onKeyDown={withHokey(keymap)}
                   onChange={(e) => {
                     updateNote(e.target.value);
                   }} />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={2000}
+          hideProgressBar={true}
+          newestOnTop={false}
+          closeOnClick
+        />
       </div>
       <FilteredTreeView className={style.sidebar}
                         data={notes}
