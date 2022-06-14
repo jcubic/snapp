@@ -1,5 +1,7 @@
 import { useState, useEffect, Dispatch, SetStateAction, createContext } from 'react';
 
+import { useRPC } from './rpc';
+
 type setAuth = Dispatch<SetStateAction<IAuth | null>>;
 
 type AuthContext = {
@@ -24,25 +26,30 @@ function getStorageAuth(): IAuth | null {
     return JSON.parse(data);
 }
 
-function setStorageAuth(auth: IAuth): void {
-    localStorage.setItem(LS_KEY, JSON.stringify(auth));
+function setStorageAuth(auth: IAuth | null): void {
+    if (!auth) {
+        localStorage.removeItem(LS_KEY);
+    } else {
+        localStorage.setItem(LS_KEY, JSON.stringify(auth));
+    }
 }
 
 function useAuth() {
-    const [auth, setAuth] = useState<IAuth | null>(null);
-
-    useEffect(() => {
-        if (auth) {
-            setStorageAuth(auth);
-        }
-    }, [auth]);
+    const [ auth, setAuth ] = useState<IAuth | null>(null);
+    const { call: checkIfValid, result: validToken } = useRPC<boolean>('valid_token');
 
     useEffect(() => {
         const auth = getStorageAuth();
         if (auth) {
-            setAuth(auth);
+            if (validToken === null) {
+                checkIfValid(auth.username, auth.token);
+            } else if (validToken) {
+                setStorageAuth(auth);
+            } else {
+                setStorageAuth(null);
+            }
         }
-    }, [setAuth]);
+    }, [setAuth, validToken]);
 
     return { auth, setAuth };
 }
