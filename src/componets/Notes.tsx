@@ -22,6 +22,10 @@ type NotesProps = {
     title?: (arg: INote) => string;
 }
 
+type classNameT = {
+  isActive: boolean;
+};
+
 const Notes: FC<NotesProps> = ({title}) => {
   const { auth } = useContext(AuthContext);
   const { id } = useParams();
@@ -135,8 +139,14 @@ const Notes: FC<NotesProps> = ({title}) => {
       e.preventDefault();
     }
   };
+  const className = ({isActive}: classNameT) => {
+    const classNames = [style.link];
+    if (isActive) {
+      classNames.push(style.activeLink);
+    }
+    return classNames.join(' ');
+  };
   // TODO: add toaster for RPC errors
-
 
   return (
     <div className={ style.app }>
@@ -163,13 +173,7 @@ const Notes: FC<NotesProps> = ({title}) => {
                         filter={(re, note) => !!note.name.match(re)}
                         link={(note: INote) => {
                           return <NavLink to={`/notes/${note.id}`}
-                                          className={({isActive}) => {
-                                            const classNames = [style.link];
-                                            if (isActive) {
-                                              classNames.push(style.activeLink);
-                                            }
-                                            return classNames.join(' ');
-                                          }}>
+                                          className={className}>
                             {note.name}{note.dirty ? "*" : ""}
                           </NavLink>;
                         }}/>
